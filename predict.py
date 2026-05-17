@@ -25,7 +25,7 @@ model.classifier[3] = nn.Linear(1024, 3)
 
 # Load trained model
 state_dict = torch.load(
-    "model/mobilenetv3_final.pth",
+    "model/cnn_feature_extractor_stroberi.pth",
     map_location="cpu"
 )
 
