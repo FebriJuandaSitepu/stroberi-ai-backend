@@ -13,13 +13,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Batas minimum confidence supaya dianggap valid (untuk kematangan)
+CONFIDENCE_THRESHOLD = 70.0  # dalam persen, silakan disesuaikan
+
 # =====================================
 # ROOT ENDPOINT
 # =====================================
 
 @app.get("/")
 def home():
-
     return {
         "message": "API Stroberi AI Aktif"
     }
@@ -39,9 +41,35 @@ async def predict(file: UploadFile = File(...)):
 
     # Predict AI
     result, confidence = predict_image(temp_file)
+    confidence = round(confidence, 2)
 
-    # Return JSON
+    # =====================================
+    # CEK 1: GATEKEEPER - apakah objeknya stroberi?
+    # =====================================
+    if result == "Bukan Stroberi":
+        return {
+            "prediction": "Tidak Dikenali",
+            "confidence": confidence,
+            "is_valid": False,
+            "message": "Gambar tidak terdeteksi sebagai stroberi. Silakan upload gambar stroberi yang lebih jelas."
+        }
+
+    # =====================================
+    # CEK 2: THRESHOLD - apakah AI cukup yakin dengan kematangannya?
+    # =====================================
+    if confidence < CONFIDENCE_THRESHOLD:
+        return {
+            "prediction": "Tidak Dikenali",
+            "confidence": confidence,
+            "is_valid": False,
+            "message": "AI kurang yakin dengan tingkat kematangan gambar ini. Coba upload gambar yang lebih jelas."
+        }
+
+    # =====================================
+    # Return JSON normal
+    # =====================================
     return {
         "prediction": result,
-        "confidence": round(confidence, 2)
+        "confidence": confidence,
+        "is_valid": True
     }
