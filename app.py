@@ -48,7 +48,7 @@ async def predict(file: UploadFile = File(...)):
     # =====================================
     if result == "Bukan Stroberi":
         return {
-            "prediction": "Tidak Dikenali",
+           "prediction": "Tidak Dikenali",
             "confidence": confidence,
             "is_valid": False,
             "message": "Gambar tidak terdeteksi sebagai stroberi. Silakan upload gambar stroberi yang lebih jelas."
