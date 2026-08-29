@@ -5,15 +5,14 @@ import numpy as np
 
 from PIL import Image
 from torchvision import transforms
-from torchvision.models import mobilenet_v3_small
-from torchvision.models import mobilenet_v2, MobileNet_V2_Weights
+from torchvision.models import mobilenet_v3_small, MobileNet_V3_Small_Weights
 
 # =====================================
-# LOAD GATEKEEPER MODEL (Pretrained ImageNet)
+# LOAD GATEKEEPER MODEL (Pretrained ImageNet, MobileNetV3 Small)
 # =====================================
 
-gatekeeper_weights = MobileNet_V2_Weights.IMAGENET1K_V1
-gatekeeper_model = mobilenet_v2(weights=gatekeeper_weights)
+gatekeeper_weights = MobileNet_V3_Small_Weights.IMAGENET1K_V1
+gatekeeper_model = mobilenet_v3_small(weights=gatekeeper_weights)
 gatekeeper_model.eval()
 
 # Ambil daftar nama kelas ImageNet (1000 kelas)
@@ -25,7 +24,7 @@ gatekeeper_transform = gatekeeper_weights.transforms()
 # Kata kunci yang dianggap valid sebagai "stroberi"
 STRAWBERRY_KEYWORDS = ["strawberry"]
 
-print("✅ Gatekeeper model (MobileNetV2 ImageNet) berhasil diload")
+print("✅ Gatekeeper model (MobileNetV3 Small ImageNet) berhasil diload")
 
 
 def is_strawberry(image_path, top_k=5):
@@ -67,7 +66,7 @@ with open("model/classes.txt", "r") as f:
     classes = [x.strip() for x in f.readlines()]
 
 # =====================================
-# LOAD CNN MODEL (MobileNetV3)
+# LOAD CNN MODEL (MobileNetV3) - Model Utama
 # =====================================
 
 model = mobilenet_v3_small()
@@ -88,7 +87,7 @@ model.load_state_dict(
 
 model.eval()
 
-print("✅ MobileNetV3 berhasil diload")
+print("✅ MobileNetV3 (model utama) berhasil diload")
 
 # =====================================
 # LOAD SVM MODEL
@@ -176,67 +175,9 @@ def predict_image(image_path):
     confidence = 0.0
 
     try:
-
         probabilities = svm_model.predict_proba(features)
-
         confidence = np.max(probabilities) * 100
-
     except:
-
-        confidence = 0.0
-
-    # =====================================
-    # GET CLASS NAME
-    # =====================================
-
-    class_name = classes[prediction[0]]
-
-    return class_name, confidence
-
-    # =====================================
-    # FEATURE EXTRACTION CNN
-    # =====================================
-
-    with torch.no_grad():
-
-        # Ambil feature map dari MobileNetV3
-        features = model.features(image_tensor)
-
-        # Pooling
-        features = torch.nn.functional.adaptive_avg_pool2d(
-            features,
-            (1, 1)
-        )
-
-        # Flatten menjadi vector
-        features = torch.flatten(features, 1)
-
-    # Convert tensor ke numpy
-    features = features.numpy()
-
-    # Debug shape
-    print("📌 Shape fitur:", features.shape)
-
-    # =====================================
-    # SVM CLASSIFICATION
-    # =====================================
-
-    prediction = svm_model.predict(features)
-
-    # =====================================
-    # CONFIDENCE SCORE
-    # =====================================
-
-    confidence = 0.0
-
-    try:
-
-        probabilities = svm_model.predict_proba(features)
-
-        confidence = np.max(probabilities) * 100
-
-    except:
-
         confidence = 0.0
 
     # =====================================
