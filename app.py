@@ -14,7 +14,7 @@ app.add_middleware(
 )
 
 # Batas minimum confidence supaya dianggap valid (untuk kematangan)
-CONFIDENCE_THRESHOLD = 70.0  # dalam persen, silakan disesuaikan
+CONFIDENCE_THRESHOLD = 60.0  # dalam persen, silakan disesuaikan
 
 # =====================================
 # ROOT ENDPOINT

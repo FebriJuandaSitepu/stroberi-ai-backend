@@ -139,7 +139,8 @@ def predict_image(image_path):
     image_tensor = image_tensor.unsqueeze(0)
 
     # =====================================
-    # FEATURE EXTRACTION CNN
+    # FEATURE EXTRACTION MobileNetV3 Small
+    # Tujuan: model ini dipakai sebagai FEATURE EXTRACTOR (bukan classifier akhir!)
     # =====================================
 
     with torch.no_grad():
